@@ -1,26 +1,35 @@
 import { useState } from 'react'
+import { loginWithCognito } from '../services/AxiosInstance'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!email || !password) {
       setError('Please enter email and password')
       return
     }
-    setError('')
-    window.location.href = 'https://www.urbancompany.com/chennai'
+    try {
+      setLoading(true)
+      setError('')
+      await loginWithCognito(email, password)
+      window.location.href = '/dashboard'
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Invalid email or password')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 px-4">
       <div className="w-full max-w-md">
         <div className="bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-white">
-          
+
           <h2 className="text-3xl font-bold text-purple-700 mb-1 text-center">
             Welcome Back LifesArc
           </h2>
@@ -35,7 +44,7 @@ function Login() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -48,7 +57,6 @@ function Login() {
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-purple-400 focus:outline-none"
               />
             </div>
-
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -64,33 +72,23 @@ function Login() {
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-purple-600 rounded focus:ring-purple-400"
-                />
-                <span className="ml-2 text-gray-700">Remember me</span>
-              </label>
-
               <a href="#" className="text-purple-600 hover:underline">
                 Forgot password?
               </a>
             </div>
 
-
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white py-2.5 rounded-xl font-semibold transition"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white py-2.5 rounded-xl font-semibold transition disabled:opacity-50"
             >
-              Sign In ✨
+              {loading ? 'Signing in...' : 'Sign In to Your Account'}
             </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Don’t have an account?{' '}
-            <a href="#" className="text-purple-600 font-semibold hover:underline">
+            <a href="/signup" className="text-purple-600 font-semibold hover:underline">
               Sign up
             </a>
           </p>

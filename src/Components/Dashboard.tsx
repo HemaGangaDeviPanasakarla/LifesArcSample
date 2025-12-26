@@ -10,6 +10,10 @@ function Dashboard() {
           You are successfully logged in.
         </p>
 
+        <p><button onClick={() => window.location.href = '/profile'} className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">Continue to Address</button></p>
+
+        <br />
+
         <button
           onClick={() => {
             localStorage.clear()
